@@ -1,0 +1,36 @@
+<ion-view id="homeview" view-title="{{page.title}}" ng-init="init()">
+    <ion-content id="content" scroll="false">
+        <ion-slide-box active-slide="slideIndex" >
+            <ion-slide>
+                <div id="wrapper" class="weather-settings" ng-style="weatherStyle">
+                    <div class="fadeInLoad" id="settings">
+                        <div class="row responsive-sm">
+                            <div ng-model="metric" class="col" ng-init="metricstyle='underline';" ng-click="changeUnits('metric'); metricstyle='underline'; farenheitstyle='clearunderline';">
+                                <p ng-class="metricstyle">Metric</p>
+                            </div>
+                            <div ng-model="farenheit" class="col" ng-click="changeUnits('farenheit'); farenheitstyle='underline'; metricstyle='clearunderline';">
+                                <p ng-class="farenheitstyle">Farenheit</p>
+                            </div>
+                            <div class="col" ng-click="update()">
+                                <p>force refresh</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div id="wrapper">
+                    <div class="fadeInLoad" id="header"></div>
+                    <div id="loader" class="loader fadeInLoad" ng-hide="{{loader}}">Loading...</div>
+                    <div class="fadeInLoad" id="weather"></div>
+                    <div class="fadeInLoad" id="forecast"></div>
+                </div>
+            </ion-slide>
+            <ion-slide>
+                <div id="wrapper" class="weather-time" ng-style="weatherStyle">
+                    <div class="fadeInLoad" id="time"></div>
+                </div>
+            </ion-slide>
+        </ion-slide-box>
+    </ion-content>
+</ion-view>
