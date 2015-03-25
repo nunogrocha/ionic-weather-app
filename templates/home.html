@@ -1,6 +1,8 @@
 <ion-view id="homeview" view-title="{{page.title}}" ng-init="init()">
     <ion-content id="content" scroll="false">
+        <!-- Slide Box. Default slider is defined on $scope.slideIndex -->
         <ion-slide-box active-slide="slideIndex" >
+            <!-- #0: Settings slide -->
             <ion-slide>
                 <div id="wrapper" class="weather-settings" ng-style="weatherStyle">
                     <div class="fadeInLoad" id="settings">
@@ -18,6 +20,7 @@
                     </div>
                 </div>
             </ion-slide>
+            <!-- #1: Home Slide -->
             <ion-slide>
                 <div id="wrapper">
                     <div class="fadeInLoad" id="header"></div>
@@ -26,6 +29,7 @@
                     <div class="fadeInLoad" id="forecast"></div>
                 </div>
             </ion-slide>
+            <!-- #2: Forecast Slide -->
             <ion-slide>
                 <div id="wrapper" class="weather-time" ng-style="weatherStyle">
                     <div class="fadeInLoad" id="time"></div>
