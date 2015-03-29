@@ -1,6 +1,9 @@
 # ionic-weather-app
 Simple example app that shows current weather and forecasts using OpenWeatherMap, ngStorage and ngCordova.
 
+# Screenshots
+![Sunny](http://i.imgur.com/vYAk3TE.png)
+
 # How to get started
 * Install ionic from [http://ionicframework.com/](here)
 * Follow install instructions [http://ionicframework.com/getting-started/](here)
