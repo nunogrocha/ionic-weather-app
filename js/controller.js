@@ -51,8 +51,7 @@ homeController.controller('homeControllerWrapper', ['$scope','$rootScope','$q','
                     //only stores the forecast when the date is different from today and the time is between 12h and 18h
                     //this interval is only an example, as OWM returns forecasts in 3h intervals
                     for (var i = 0; i < weatherForecast.list.length; i++) {
-                        console.log(new Date(weatherForecast.list[i].dt*1000).getHours()+' '+new Date(weatherForecast.list[i].dt*1000).getDate());
-                        if (new Date(weatherForecast.list[i].dt*1000).getHours() > 12 && new Date(weatherForecast.list[i].dt*1000).getHours() < 18 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
+                        if (new Date(weatherForecast.list[i].dt*1000).getHours() > 13 && new Date(weatherForecast.list[i].dt*1000).getHours() < 17 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
                             $scope.page.forecast[forecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
                             forecastCount++;
                         }
