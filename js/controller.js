@@ -48,10 +48,11 @@ homeController.controller('homeControllerWrapper', ['$scope','$rootScope','$q','
                     var timeForecastCount=0;
 
                     //check the forecast to store the 'next 3 days forecast' on the default slide
-                    //only stores the forecast when the date is different from today and the time is 15:00
-                    //15:00 is only an example, it returns forecasts on 3h intervals
+                    //only stores the forecast when the date is different from today and the time is between 12h and 18h
+                    //this interval is only an example, as OWM returns forecasts in 3h intervals
                     for (var i = 0; i < weatherForecast.list.length; i++) {
-                        if (new Date(weatherForecast.list[i].dt*1000).getHours() == 15 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
+                        console.log(new Date(weatherForecast.list[i].dt*1000).getHours()+' '+new Date(weatherForecast.list[i].dt*1000).getDate());
+                        if (new Date(weatherForecast.list[i].dt*1000).getHours() > 12 && new Date(weatherForecast.list[i].dt*1000).getHours() < 18 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
                             $scope.page.forecast[forecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
                             forecastCount++;
                         }
@@ -120,6 +121,7 @@ homeController.controller('homeControllerWrapper', ['$scope','$rootScope','$q','
 
       //inserts the 3 day forecast
       var forecast = angular.element( document.querySelector( '#forecast' ) );
+      console.log($scope.page.forecast.length);
       for (var i = 0; i < $scope.page.forecast.length; i++) {
           var date = new Date(parseInt($scope.page.forecast[i].datetime)*1000);
           forecast.append('<p class="forecast">'+getDayString(date)+' <span class="weather-icon">'+getIcon($scope.page.forecast[i].cod).cod+'</span> '+Math.round($scope.page.forecast[i].temp_min)+'º / '+Math.round($scope.page.forecast[i].temp_max)+'º</p>');
