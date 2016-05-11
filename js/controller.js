@@ -27,69 +27,57 @@ homeController.controller('homeControllerWrapper', ['$scope','$rootScope','$q','
 
     //boot function that runs all the services to fill $scope.page
     function run(){
-
-        //gets the coordinates
         var promiseCoordinates = weatherService.getCoordinates();
         promiseCoordinates.then(function(coordinates) {
-
+            //gets the coordinates
             $scope.page.lat = coordinates.lat;
-            $scope.page.long = coordinates.long;
-
+            $scope.page.lon = coordinates.lon;
+            return weatherService.getWeather(coordinates.lat,coordinates.long,settingsService.getSettings().units);
+        }).then(function(weather) {
             //gets the actual weather
-            var promiseWeather = weatherService.getWeather($scope.page.lat,$scope.page.long,settingsService.getSettings().units);
-            promiseWeather.then(function(weather) {
-                $scope.page.name = weather.name;
-                $scope.page.temp = {temp: weather.main.temp, cod: weather.weather[0].icon, sky: weather.weather[0].main, description: weather.weather[0].description, temp_min: weather.main.temp_min, temp_max: weather.main.temp_max};
+            $scope.page.name = weather.name;
+            $scope.page.temp = {temp: weather.main.temp, cod: weather.weather[0].icon, sky: weather.weather[0].main, description: weather.weather[0].description, temp_min: weather.main.temp_min, temp_max: weather.main.temp_max};
+            return weatherService.getWeatherForecast($scope.page.lat,$scope.page.long,settingsService.getSettings().units);
+        }).then(function(weatherForecast) {
+            var forecastCount=0;
+            var timeForecastCount=0;
 
-                //gets the weather forecast
-                var promiseWeatherForecast = weatherService.getWeatherForecast($scope.page.lat,$scope.page.long,settingsService.getSettings().units);
-                promiseWeatherForecast.then(function(weatherForecast) {
-                    var forecastCount=0;
-                    var timeForecastCount=0;
+            //check the forecast to store the 'next 3 days forecast' on the default slide
+            //only stores the forecast when the date is different from today and the time is between 12h and 18h
+            //this interval is only an example, as OWM returns forecasts in 3h intervals
+            for (var i = 0; i < weatherForecast.list.length; i++) {
+                if (new Date(weatherForecast.list[i].dt*1000).getHours() > 13 && new Date(weatherForecast.list[i].dt*1000).getHours() < 17 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
+                    $scope.page.forecast[forecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
+                    forecastCount++;
+                }
+                if (forecastCount==3) {
+                    break;
+                }
+            }
 
-                    //check the forecast to store the 'next 3 days forecast' on the default slide
-                    //only stores the forecast when the date is different from today and the time is between 12h and 18h
-                    //this interval is only an example, as OWM returns forecasts in 3h intervals
-                    for (var i = 0; i < weatherForecast.list.length; i++) {
-                        if (new Date(weatherForecast.list[i].dt*1000).getHours() > 13 && new Date(weatherForecast.list[i].dt*1000).getHours() < 17 && new Date(weatherForecast.list[i].dt*1000).getDate() != new Date().getDate()) {
-                            $scope.page.forecast[forecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
-                            forecastCount++;
-                        }
-                        if (forecastCount==3) {
-                            break;
-                        }
-                    }
+            //check the forecast to store the 'next 5 3h intervals' on the right side slide wich has more detailed info
+            for (var i = 0; i < weatherForecast.list.length; i++) {
+                $scope.page.timeforecast[timeForecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
+                timeForecastCount++;
+                if (timeForecastCount==5) {
+                    break;
+                }
+            }
 
-                    //check the forecast to store the 'next 5 3h intervals' on the right side slide wich has more detailed info
-                    for (var i = 0; i < weatherForecast.list.length; i++) {
-                        $scope.page.timeforecast[timeForecastCount] = { datetime : weatherForecast.list[i].dt, cod: weatherForecast.list[i].weather[0].icon, temp: weatherForecast.list[i].main.temp, sky: weatherForecast.list[i].weather[0].main, description: weatherForecast.list[i].weather[0].description, temp_min: weatherForecast.list[i].main.temp_min, temp_max:weatherForecast.list[i].main.temp_max };
-                        timeForecastCount++;
-                        if (timeForecastCount==5) {
-                            break;
-                        }
-                    }
+            //gets the actual date and sends it to functions that return the right format to write on the DOM
+            var date = new Date();
+            $scope.page.day = getDayString(date);
+            $scope.page.time = getTimeString(date);
 
-                    //gets the actual date and sends it to functions that return the right format to write on the DOM
-                    var date = new Date();
-                    $scope.page.day = getDayString(date);
-                    $scope.page.time = getTimeString(date);
+            //shows all the controller data on the console
+            console.log($scope.page);
 
-                    //shows all the controller data on the console
-                    console.log($scope.page);
+            //build the DOM with the data from $scope.page
+            buildDOM();
 
-                    //build the DOM with the data from $scope.page
-                    buildDOM();
-
-                    //hide the loading animation
-                    document.getElementById('loader').style.display = 'none';
-                });
-
-            });
-        }, function(reason) {
-            //if an error occurs, try again
-            run();
+            //hide the loading animation
+            document.getElementById('loader').style.display = 'none';
         });
-
     }
 
     //builds the DOM with data from $scope.page
